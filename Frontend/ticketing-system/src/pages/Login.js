@@ -1,39 +1,76 @@
-import React, { Component } from "react";
-import axios from "axios";
-import { setCredentials } from "../features/authSlice";
-import { connect } from "react-redux";
+// src/components/Login.js
+import React, { useState } from "react";
 
-class Login extends Component {
-  state = { username: "", password: "" };
+function Login({ onAuth }) {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-  handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    const { username, password } = this.state;
-    const res = await axios.post("http://localhost:5000/login", {
-      username,
-      password,
-    });
-    this.props.setCredentials({ user: res.data.user, token: res.data.token });
-    this.props.history.push("/dashboard");
+    if (!username || !password) {
+      setError("Please enter both username and password.");
+      return;
+    }
+
+    if (username === "test" && password === "password") {
+      onAuth({ username: username });
+    } else {
+      setError("Invalid username or password.");
+    }
   };
 
-  render() {
-    return (
-      <form onSubmit={this.handleSubmit}>
-        <input
-          type="text"
-          placeholder="Username"
-          onChange={(e) => this.setState({ username: e.target.value })}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          onChange={(e) => this.setState({ password: e.target.value })}
-        />
-        <button type="submit">Login</button>
+  return (
+    <div
+      style={{
+        maxWidth: "300px",
+        margin: "auto",
+        padding: "20px",
+        border: "1px solid #ccc",
+        borderRadius: "5px",
+      }}
+    >
+      <h2>Login</h2>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      <form onSubmit={handleSubmit}>
+        {/* ... (input fields and button) ... */}
+        <div style={{ marginBottom: "10px" }}>
+          <label htmlFor="username">Username:</label>
+          <input
+            type="text"
+            id="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
+          />
+        </div>
+        <div style={{ marginBottom: "10px" }}>
+          <label htmlFor="password">Password:</label>
+          <input
+            type="password"
+            id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
+          />
+        </div>
+        <button
+          type="submit"
+          style={{
+            width: "100%",
+            padding: "10px",
+            backgroundColor: "#007bff",
+            color: "white",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+          }}
+        >
+          Login
+        </button>
       </form>
-    );
-  }
+    </div>
+  );
 }
 
-export default connect(null, { setCredentials })(Login);
+export default Login;
